@@ -1,23 +1,36 @@
-import type { CardId, RuleAspect } from "./types/card.js";
+﻿import type { CardId, RuleAspect } from "./types/card.js";
 import type { Category } from "./types/category.js";
 import type { GameEventKind } from "./types/event.js";
 import type { Phase } from "./types/phase.js";
 
 /**
- * Проводной контракт состояния Overrule.
+ * РџСЂРѕРІРѕРґРЅРѕР№ РєРѕРЅС‚СЂР°РєС‚ СЃРѕСЃС‚РѕСЏРЅРёСЏ Overrule.
  *
- * Здесь только структура данных, без Colyseus: клиент остаётся на
- * `@colyseus/schema` 5, а сервер — на 0.17/schema 4, поэтому общий пакет
- * не может содержать schema-классы ни одной из версий. Сервер описывает
- * классы схемы локально и проверяет соответствие этому контракту, клиент
- * использует контракт как тип состояния комнаты.
+ * Р—РґРµСЃСЊ С‚РѕР»СЊРєРѕ СЃС‚СЂСѓРєС‚СѓСЂР° РґР°РЅРЅС‹С…, Р±РµР· Colyseus: РєР»РёРµРЅС‚ РѕСЃС‚Р°С‘С‚СЃСЏ РЅР°
+ * `@colyseus/schema` 5, Р° СЃРµСЂРІРµСЂ вЂ” РЅР° 0.17/schema 4, РїРѕСЌС‚РѕРјСѓ РѕР±С‰РёР№ РїР°РєРµС‚
+ * РЅРµ РјРѕР¶РµС‚ СЃРѕРґРµСЂР¶Р°С‚СЊ schema-РєР»Р°СЃСЃС‹ РЅРё РѕРґРЅРѕР№ РёР· РІРµСЂСЃРёР№. РЎРµСЂРІРµСЂ РѕРїРёСЃС‹РІР°РµС‚
+ * РєР»Р°СЃСЃС‹ СЃС…РµРјС‹ Р»РѕРєР°Р»СЊРЅРѕ Рё РїСЂРѕРІРµСЂСЏРµС‚ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ СЌС‚РѕРјСѓ РєРѕРЅС‚СЂР°РєС‚Сѓ, РєР»РёРµРЅС‚
+ * РёСЃРїРѕР»СЊР·СѓРµС‚ РєРѕРЅС‚СЂР°РєС‚ РєР°Рє С‚РёРї СЃРѕСЃС‚РѕСЏРЅРёСЏ РєРѕРјРЅР°С‚С‹.
  */
 
-/** Имя комнаты Overrule на сервере (совпадает у клиента и сервера). */
+/** РРјСЏ РєРѕРјРЅР°С‚С‹ Overrule РЅР° СЃРµСЂРІРµСЂРµ (СЃРѕРІРїР°РґР°РµС‚ Сѓ РєР»РёРµРЅС‚Р° Рё СЃРµСЂРІРµСЂР°). */
 export const OVERRULE_ROOM_NAME = "overrule";
 
-/** Имя лобби-комнаты, через которую клиент получает список открытых комнат. */
+/** РРјСЏ Р»РѕР±Р±Рё-РєРѕРјРЅР°С‚С‹, С‡РµСЂРµР· РєРѕС‚РѕСЂСѓСЋ РєР»РёРµРЅС‚ РїРѕР»СѓС‡Р°РµС‚ СЃРїРёСЃРѕРє РѕС‚РєСЂС‹С‚С‹С… РєРѕРјРЅР°С‚. */
 export const OVERRULE_LOBBY_ROOM_NAME = "lobby";
+
+/**
+ * РњРёРЅРёРјР°Р»СЊРЅР°СЏ С„РѕСЂРјР° РјР°СЃСЃРёРІР° РёР· Colyseus (`ArraySchema` СЂРµР°Р»РёР·СѓРµС‚ `Array`,
+ * РЅРѕ РµРіРѕ `concat`/`map` С‚РёРїРёР·РёСЂРѕРІР°РЅС‹ СѓР¶Рµ, С‡РµРј `ReadonlyArray`). РљР»РёРµРЅС‚Сѓ РЅСѓР¶РЅС‹
+ * С‚РѕР»СЊРєРѕ С‡С‚РµРЅРёРµ, `at`, `forEach` Рё РёС‚РµСЂР°С†РёСЏ.
+ */
+export interface WireArray<T> {
+  readonly [index: number]: T;
+  readonly length: number;
+  at(index: number): T | undefined;
+  forEach(callbackfn: (value: T, index: number) => void): void;
+  [Symbol.iterator](): IterableIterator<T>;
+}
 
 export interface CardWire {
   id: CardId;
@@ -25,7 +38,7 @@ export interface CardWire {
   text: string;
 }
 
-/** Глобальное карточное правило партии (ADR-013/014/015). */
+/** Р“Р»РѕР±Р°Р»СЊРЅРѕРµ РєР°СЂС‚РѕС‡РЅРѕРµ РїСЂР°РІРёР»Рѕ РїР°СЂС‚РёРё (ADR-013/014/015). */
 export interface RuleWire {
   id: string;
   cardId: CardId;
@@ -34,7 +47,7 @@ export interface RuleWire {
   ownerId: string;
 }
 
-/** Публичная запись журнала событий (ADR-008/009). */
+/** РџСѓР±Р»РёС‡РЅР°СЏ Р·Р°РїРёСЃСЊ Р¶СѓСЂРЅР°Р»Р° СЃРѕР±С‹С‚РёР№ (ADR-008/009). */
 export interface EventWire {
   seq: number;
   kind: GameEventKind;
@@ -44,7 +57,7 @@ export interface EventWire {
   replaced: boolean;
   category: Category | "";
   points: number;
-  dice: ReadonlyArray<number>;
+  dice: WireArray<number>;
   reason: "timeout" | "disconnect" | "";
 }
 
@@ -56,20 +69,20 @@ export interface PlayerWire {
   reconnectPending: boolean;
   score: number;
   rollsLeft: number;
-  /** Сколько бросков было в начале текущего хода (включая накопленные). */
+  /** РЎРєРѕР»СЊРєРѕ Р±СЂРѕСЃРєРѕРІ Р±С‹Р»Рѕ РІ РЅР°С‡Р°Р»Рµ С‚РµРєСѓС‰РµРіРѕ С…РѕРґР° (РІРєР»СЋС‡Р°СЏ РЅР°РєРѕРїР»РµРЅРЅС‹Рµ). */
   turnRolls: number;
-  /** Накопленные перебросы, перенесённые на следующий ход. */
+  /** РќР°РєРѕРїР»РµРЅРЅС‹Рµ РїРµСЂРµР±СЂРѕСЃС‹, РїРµСЂРµРЅРµСЃС‘РЅРЅС‹Рµ РЅР° СЃР»РµРґСѓСЋС‰РёР№ С…РѕРґ. */
   bonusRolls: number;
-  /** Очки, списанные за платные перебросы в этом ходу. */
+  /** РћС‡РєРё, СЃРїРёСЃР°РЅРЅС‹Рµ Р·Р° РїР»Р°С‚РЅС‹Рµ РїРµСЂРµР±СЂРѕСЃС‹ РІ СЌС‚РѕРј С…РѕРґСѓ. */
   turnPenalty: number;
   hasRolled: boolean;
-  /** Игрок уже разыграл карту в этом ходу (лимит — одна карта). */
+  /** РРіСЂРѕРє СѓР¶Рµ СЂР°Р·С‹РіСЂР°Р» РєР°СЂС‚Сѓ РІ СЌС‚РѕРј С…РѕРґСѓ (Р»РёРјРёС‚ вЂ” РѕРґРЅР° РєР°СЂС‚Р°). */
   cardPlayedThisTurn: boolean;
-  keepDice: ReadonlyArray<boolean>;
-  dice: ReadonlyArray<number>;
-  wildDice: ReadonlyArray<boolean>;
+  keepDice: WireArray<boolean>;
+  dice: WireArray<number>;
+  wildDice: WireArray<boolean>;
   sheet: ReadonlyMap<string, number>;
-  hand: ReadonlyArray<CardWire>;
+  hand: WireArray<CardWire>;
   pendingDiscard: boolean;
   discardSecondsLeft: number;
 }
@@ -82,13 +95,14 @@ export interface GameStateWire {
   phase: Phase;
   round: number;
   activePlayerId: string;
-  /** Настроенная длительность обычного хода; grace period отключения отдельный. */
+  /** РќР°СЃС‚СЂРѕРµРЅРЅР°СЏ РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ РѕР±С‹С‡РЅРѕРіРѕ С…РѕРґР°; grace period РѕС‚РєР»СЋС‡РµРЅРёСЏ РѕС‚РґРµР»СЊРЅС‹Р№. */
   turnDurationSeconds: number;
-  /** Отключает таймаут обычного хода, но не grace period дисконнекта. */
+  /** РћС‚РєР»СЋС‡Р°РµС‚ С‚Р°Р№РјР°СѓС‚ РѕР±С‹С‡РЅРѕРіРѕ С…РѕРґР°, РЅРѕ РЅРµ grace period РґРёСЃРєРѕРЅРЅРµРєС‚Р°. */
   turnTimerEnabled: boolean;
-  /** Сколько секунд осталось на ход. Тикает только сервер. */
+  /** РЎРєРѕР»СЊРєРѕ СЃРµРєСѓРЅРґ РѕСЃС‚Р°Р»РѕСЃСЊ РЅР° С…РѕРґ. РўРёРєР°РµС‚ С‚РѕР»СЊРєРѕ СЃРµСЂРІРµСЂ. */
   turnSecondsLeft: number;
-  rules: ReadonlyArray<RuleWire>;
-  events: ReadonlyArray<EventWire>;
-  players: ReadonlyArray<PlayerWire>;
+  rules: WireArray<RuleWire>;
+  events: WireArray<EventWire>;
+  players: WireArray<PlayerWire>;
 }
+
