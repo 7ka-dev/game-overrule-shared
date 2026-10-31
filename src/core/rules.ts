@@ -1,11 +1,12 @@
 import type { CardId, RuleAspect } from "../types/card.js";
 
 /**
- * Активное глобальное правило партии (ADR-013/015).
+ * Active global rule for a match (ADR-013/015).
  *
- * Правило действует на всех игроков до конца партии, пока его не перекроет
- * карта того же аспекта. Живёт в синхронизируемом состоянии, потому что её
- * видят и сервер (авторитарные расчёты), и клиент (подсказки и preview очков).
+ * A rule affects all players until the end of the match, until a card with
+ * the same aspect replaces it. It lives in replicated state because both the
+ * server (authoritative calculations) and the client (hints and score preview)
+ * need it.
  */
 export interface ActiveRule {
   id: string;
@@ -27,8 +28,8 @@ export function hasRule(rules: readonly ActiveRule[], aspect: RuleAspect): boole
 }
 
 /**
- * Установка правила: правило того же аспекта заменяется.
- * Возвращает новый массив, исходный не мутируется.
+ * Applies a rule: an existing rule with the same aspect is replaced.
+ * Returns a new array and does not mutate the input.
  */
 export function upsertRule(rules: readonly ActiveRule[], next: ActiveRule): ActiveRule[] {
   const filtered = rules.filter((rule) => rule.aspect !== next.aspect);
@@ -46,8 +47,8 @@ export function ruleNumber(rule: ActiveRule | undefined, fallback: number): numb
 export const DEFAULT_REROLLS = 2;
 
 /**
- * Сколько перебросов разрешено за ход. Карта «запрет перебросов» даёт 0,
- * «только один переброс» — 1.
+ * Number of rerolls allowed per turn. The "no rerolls" card yields 0,
+ * "only one reroll" yields 1.
  */
 export function rerollLimit(rules: readonly ActiveRule[]): number {
   return ruleNumber(ruleOf(rules, "reroll-limit"), DEFAULT_REROLLS);

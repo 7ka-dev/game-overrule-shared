@@ -1,12 +1,14 @@
 import type { Category } from "../types/category.js";
 /**
- * Категории MVP — классический лист Ятци без «4 одинаковых» и «большого стрита»:
- * GDD их не использует, а `scoreCategory` держит только для совместимости.
+ * MVP categories: the classic Yahtzee sheet without "four of a kind" and
+ * "large straight". The GDD does not use them; `scoreCategory` keeps them
+ * only for compatibility.
  *
- * Порядок важен: он задаёт вид таблицы очков и выбор при равенстве в Best Guess.
+ * Order matters: it defines the score table layout and tie-breaking in
+ * Best Guess.
  */
 export declare const SCORE_CATEGORIES: readonly Category[];
-/** Свободные категории в порядке листа. */
+/** Available categories in sheet order. */
 export declare function availableCategories(taken: Iterable<Category>): Category[];
-/** Лист заполнен, когда заняты все категории MVP. */
+/** The sheet is complete when every MVP category is filled. */
 export declare function isSheetComplete(taken: Iterable<Category>): boolean;

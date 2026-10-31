@@ -14,8 +14,8 @@ export function rollDice(random: RandomFn = Math.random, count = DICE_COUNT): Di
   return Array.from({ length: count }, () => rollDie(random)) as DiceArray;
 }
 /**
- * Перебрасывает все кубики, кроме отмеченных в locked.
- * Возвращает новый массив, не мутируя исходный.
+ * Rerolls every die except the ones marked in `locked`.
+ * Returns a new array and does not mutate the input.
  */
 export function rerollDice(
   dice: readonly number[],
@@ -26,8 +26,8 @@ export function rerollDice(
 }
 
 /**
- * Добавляет шестой кубик, если его ещё нет (правило «Лишний кубик»).
- * Грань лишнего кубика участвует в подсчёте комбинаций.
+ * Adds a sixth die if it is not present yet ("Extra die" rule).
+ * The extra die's face participates in combination scoring.
  */
 export function withExtraDie(dice: readonly number[], random: RandomFn = Math.random): number[] {
   if (dice.length >= MAX_DICE) {
@@ -36,7 +36,7 @@ export function withExtraDie(dice: readonly number[], random: RandomFn = Math.ra
   return [...dice, rollDie(random)];
 }
 
-/** Перебрасывает грани, которые запрещены правилом (например, «нет шестёрок»). */
+/** Rerolls faces banned by a rule (for example, "no sixes"). */
 export function avoidBannedFace(
   dice: readonly number[],
   banned: number | null,
@@ -55,8 +55,8 @@ export function avoidBannedFace(
 }
 
 /**
- * Детерминированный генератор для тестов и серверного Best Guess AI.
- * mulberry32 — компактный PRNG с приемлемым качеством.
+ * Deterministic generator for tests and the server-side Best Guess AI.
+ * mulberry32 is a compact PRNG with acceptable quality.
  */
 export function createSeededRandom(seed: number): RandomFn {
   let state = seed >>> 0;

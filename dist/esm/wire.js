@@ -1,13 +1,14 @@
 /**
- * РџСЂРѕРІРѕРґРЅРѕР№ РєРѕРЅС‚СЂР°РєС‚ СЃРѕСЃС‚РѕСЏРЅРёСЏ Overrule.
+ * Wire contract for the Overrule room state.
  *
- * Р—РґРµСЃСЊ С‚РѕР»СЊРєРѕ СЃС‚СЂСѓРєС‚СѓСЂР° РґР°РЅРЅС‹С…, Р±РµР· Colyseus: РєР»РёРµРЅС‚ РѕСЃС‚Р°С‘С‚СЃСЏ РЅР°
- * `@colyseus/schema` 5, Р° СЃРµСЂРІРµСЂ вЂ” РЅР° 0.17/schema 4, РїРѕСЌС‚РѕРјСѓ РѕР±С‰РёР№ РїР°РєРµС‚
- * РЅРµ РјРѕР¶РµС‚ СЃРѕРґРµСЂР¶Р°С‚СЊ schema-РєР»Р°СЃСЃС‹ РЅРё РѕРґРЅРѕР№ РёР· РІРµСЂСЃРёР№. РЎРµСЂРІРµСЂ РѕРїРёСЃС‹РІР°РµС‚
- * РєР»Р°СЃСЃС‹ СЃС…РµРјС‹ Р»РѕРєР°Р»СЊРЅРѕ Рё РїСЂРѕРІРµСЂСЏРµС‚ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ СЌС‚РѕРјСѓ РєРѕРЅС‚СЂР°РєС‚Сѓ, РєР»РёРµРЅС‚
- * РёСЃРїРѕР»СЊР·СѓРµС‚ РєРѕРЅС‚СЂР°РєС‚ РєР°Рє С‚РёРї СЃРѕСЃС‚РѕСЏРЅРёСЏ РєРѕРјРЅР°С‚С‹.
+ * This file contains data shapes only, with no Colyseus dependency. The client
+ * and server use different schema versions (the client SDK brings schema 5,
+ * the server runs Colyseus 0.17 with schema 4), so a shared package cannot
+ * contain schema classes for either version. The server defines its schema
+ * classes locally and checks them against this contract at build time; the
+ * client uses the contract as the room state type.
  */
-/** РРјСЏ РєРѕРјРЅР°С‚С‹ Overrule РЅР° СЃРµСЂРІРµСЂРµ (СЃРѕРІРїР°РґР°РµС‚ Сѓ РєР»РёРµРЅС‚Р° Рё СЃРµСЂРІРµСЂР°). */
+/** Overrule room name on the server (must match on client and server). */
 export const OVERRULE_ROOM_NAME = "overrule";
-/** РРјСЏ Р»РѕР±Р±Рё-РєРѕРјРЅР°С‚С‹, С‡РµСЂРµР· РєРѕС‚РѕСЂСѓСЋ РєР»РёРµРЅС‚ РїРѕР»СѓС‡Р°РµС‚ СЃРїРёСЃРѕРє РѕС‚РєСЂС‹С‚С‹С… РєРѕРјРЅР°С‚. */
+/** Lobby room name used by the client to list public rooms. */
 export const OVERRULE_LOBBY_ROOM_NAME = "lobby";

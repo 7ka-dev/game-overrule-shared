@@ -4,10 +4,12 @@ exports.SCORE_CATEGORIES = void 0;
 exports.availableCategories = availableCategories;
 exports.isSheetComplete = isSheetComplete;
 /**
- * Категории MVP — классический лист Ятци без «4 одинаковых» и «большого стрита»:
- * GDD их не использует, а `scoreCategory` держит только для совместимости.
+ * MVP categories: the classic Yahtzee sheet without "four of a kind" and
+ * "large straight". The GDD does not use them; `scoreCategory` keeps them
+ * only for compatibility.
  *
- * Порядок важен: он задаёт вид таблицы очков и выбор при равенстве в Best Guess.
+ * Order matters: it defines the score table layout and tie-breaking in
+ * Best Guess.
  */
 exports.SCORE_CATEGORIES = [
     "Ones",
@@ -21,12 +23,12 @@ exports.SCORE_CATEGORIES = [
     "Yahtzee",
     "Chance",
 ];
-/** Свободные категории в порядке листа. */
+/** Available categories in sheet order. */
 function availableCategories(taken) {
     const used = new Set(taken);
     return exports.SCORE_CATEGORIES.filter((category) => !used.has(category));
 }
-/** Лист заполнен, когда заняты все категории MVP. */
+/** The sheet is complete when every MVP category is filled. */
 function isSheetComplete(taken) {
     const used = new Set(taken);
     return exports.SCORE_CATEGORIES.every((category) => used.has(category));

@@ -1,8 +1,8 @@
 /**
- * Правила заморозки кубиков (ADR-014/015).
+ * Dice freeze rules (ADR-014/015).
  *
- * Принудительные блокировки (чётность, выбранная грань) действуют всегда;
- * сверх них игрок может сам оставить до N кубиков, если есть `freeze-count`.
+ * Forced locks (parity, selected face) always apply. On top of them, a player
+ * may keep up to N dice manually when a `freeze-count` rule is active.
  */
 function positiveInt(raw) {
     if (raw === undefined) {
@@ -33,7 +33,7 @@ export function freezeConfig(rules) {
     }
     return { count, parity, face };
 }
-/** Кубики, которые правило удерживает принудительно. */
+/** Dice that a rule keeps automatically. */
 export function forcedDiceLocks(dice, config) {
     return dice.map((value) => {
         if (config.parity !== null && (value % 2 === 0) === (config.parity === "even")) {
@@ -42,11 +42,11 @@ export function forcedDiceLocks(dice, config) {
         return config.face !== null && value === config.face;
     });
 }
-/** Есть ли вообще правила заморозки в этой партии. */
+/** Whether any freeze rule is active in this match. */
 export function hasFreezeRules(config) {
     return config.count !== null || config.parity !== null || config.face !== null;
 }
-/** Сколько кубиков игрок уже оставил сам. */
+/** How many dice the player has already kept manually. */
 export function countKept(kept) {
     return kept.filter(Boolean).length;
 }

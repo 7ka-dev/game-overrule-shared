@@ -1,8 +1,8 @@
 import type { RandomFn } from "../core/dice.js";
 
 /**
- * Перемешивание Фишера—Йетса. Возвращает новый массив, не мутируя исходный.
- * `random` параметризован, чтобы тесты были детерминированными.
+ * Fisher-Yates shuffle. Returns a new array and does not mutate the input.
+ * `random` is injectable so tests can be deterministic.
  */
 export function shuffle<T>(items: readonly T[], random: RandomFn = Math.random): T[] {
   const result = [...items];

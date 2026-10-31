@@ -1,11 +1,11 @@
 import type { GameLogEvent } from "../types/event.js";
 
-/** Сколько последних событий держим в состоянии партии. */
+/** Number of recent events kept in the match state. */
 export const MAX_LOG_EVENTS = 30;
 
 /**
- * Добавляет событие и обрезает журнал до лимита: старые записи отбрасываются,
- * чтобы состояние не разрасталось.
+ * Appends an event and trims the log to the limit: the oldest entries are
+ * dropped so the state does not grow without bound.
  */
 export function appendEvent(
   events: readonly GameLogEvent[],
@@ -16,7 +16,7 @@ export function appendEvent(
   return next.length > limit ? next.slice(next.length - limit) : next;
 }
 
-/** Следующий порядковый номер записи журнала. */
+/** Next sequence number for a log entry. */
 export function nextEventSeq(events: readonly GameLogEvent[]): number {
   return (events.at(-1)?.seq ?? 0) + 1;
 }

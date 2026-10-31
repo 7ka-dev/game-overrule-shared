@@ -2,7 +2,7 @@ import type { CardId, RuleAspect } from "./card.js";
 import type { Category } from "./category.js";
 import type { PlayerId } from "./player.js";
 
-/** Публичный тип события партии. */
+/** Public game event kind. */
 export type GameEventKind =
   | "game-start"
   | "turn"
@@ -15,28 +15,28 @@ export type GameEventKind =
   | "game-over";
 
 /**
- * Запись журнала событий (ADR-008: журнал — часть авторитарного состояния).
+ * Game log entry (ADR-008: the log is part of the authoritative state).
  *
- * В событие попадают только публичные данные: содержимое чужих рук и порядок
- * колоды здесь не появляются (ADR-009).
+ * Only public data is included: other players' hands and the deck order never
+ * appear here (ADR-009).
  */
 export interface GameLogEvent {
   seq: number;
   kind: GameEventKind;
-  /** Игрок, к которому относится событие. */
+  /** Player the event belongs to. */
   actorId: PlayerId;
-  /** Разыгранная карта (для `card-played`). */
+  /** Played card (for `card-played`). */
   cardId?: CardId;
-  /** Аспект установленного правила (для `card-played`). */
+  /** Aspect of the applied rule (for `card-played`). */
   aspect?: RuleAspect;
-  /** Карта заменила правило того же аспекта. */
+  /** The card replaced an existing rule of the same aspect. */
   replaced?: boolean;
-  /** Закрытая категория (для `commit`). */
+  /** Filled category (for `commit`). */
   category?: Category;
-  /** Начисленные очки (для `commit`). */
+  /** Awarded points (for `commit`). */
   points?: number;
-  /** Значения кубиков броска или финальной комбинации (`roll`, `commit`). */
+  /** Dice values from a roll or the final combination (`roll`, `commit`). */
   dice?: number[];
-  /** Причина автохода (для `autoplay`). */
+  /** Autoplay reason (for `autoplay`). */
   reason?: "timeout" | "disconnect";
 }

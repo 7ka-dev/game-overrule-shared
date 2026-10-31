@@ -3,22 +3,23 @@ import type { Category } from "./types/category.js";
 import type { GameEventKind } from "./types/event.js";
 import type { Phase } from "./types/phase.js";
 /**
- * РџСЂРѕРІРѕРґРЅРѕР№ РєРѕРЅС‚СЂР°РєС‚ СЃРѕСЃС‚РѕСЏРЅРёСЏ Overrule.
+ * Wire contract for the Overrule room state.
  *
- * Р—РґРµСЃСЊ С‚РѕР»СЊРєРѕ СЃС‚СЂСѓРєС‚СѓСЂР° РґР°РЅРЅС‹С…, Р±РµР· Colyseus: РєР»РёРµРЅС‚ РѕСЃС‚Р°С‘С‚СЃСЏ РЅР°
- * `@colyseus/schema` 5, Р° СЃРµСЂРІРµСЂ вЂ” РЅР° 0.17/schema 4, РїРѕСЌС‚РѕРјСѓ РѕР±С‰РёР№ РїР°РєРµС‚
- * РЅРµ РјРѕР¶РµС‚ СЃРѕРґРµСЂР¶Р°С‚СЊ schema-РєР»Р°СЃСЃС‹ РЅРё РѕРґРЅРѕР№ РёР· РІРµСЂСЃРёР№. РЎРµСЂРІРµСЂ РѕРїРёСЃС‹РІР°РµС‚
- * РєР»Р°СЃСЃС‹ СЃС…РµРјС‹ Р»РѕРєР°Р»СЊРЅРѕ Рё РїСЂРѕРІРµСЂСЏРµС‚ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ СЌС‚РѕРјСѓ РєРѕРЅС‚СЂР°РєС‚Сѓ, РєР»РёРµРЅС‚
- * РёСЃРїРѕР»СЊР·СѓРµС‚ РєРѕРЅС‚СЂР°РєС‚ РєР°Рє С‚РёРї СЃРѕСЃС‚РѕСЏРЅРёСЏ РєРѕРјРЅР°С‚С‹.
+ * This file contains data shapes only, with no Colyseus dependency. The client
+ * and server use different schema versions (the client SDK brings schema 5,
+ * the server runs Colyseus 0.17 with schema 4), so a shared package cannot
+ * contain schema classes for either version. The server defines its schema
+ * classes locally and checks them against this contract at build time; the
+ * client uses the contract as the room state type.
  */
-/** РРјСЏ РєРѕРјРЅР°С‚С‹ Overrule РЅР° СЃРµСЂРІРµСЂРµ (СЃРѕРІРїР°РґР°РµС‚ Сѓ РєР»РёРµРЅС‚Р° Рё СЃРµСЂРІРµСЂР°). */
+/** Overrule room name on the server (must match on client and server). */
 export declare const OVERRULE_ROOM_NAME = "overrule";
-/** РРјСЏ Р»РѕР±Р±Рё-РєРѕРјРЅР°С‚С‹, С‡РµСЂРµР· РєРѕС‚РѕСЂСѓСЋ РєР»РёРµРЅС‚ РїРѕР»СѓС‡Р°РµС‚ СЃРїРёСЃРѕРє РѕС‚РєСЂС‹С‚С‹С… РєРѕРјРЅР°С‚. */
+/** Lobby room name used by the client to list public rooms. */
 export declare const OVERRULE_LOBBY_ROOM_NAME = "lobby";
 /**
- * РњРёРЅРёРјР°Р»СЊРЅР°СЏ С„РѕСЂРјР° РјР°СЃСЃРёРІР° РёР· Colyseus (`ArraySchema` СЂРµР°Р»РёР·СѓРµС‚ `Array`,
- * РЅРѕ РµРіРѕ `concat`/`map` С‚РёРїРёР·РёСЂРѕРІР°РЅС‹ СѓР¶Рµ, С‡РµРј `ReadonlyArray`). РљР»РёРµРЅС‚Сѓ РЅСѓР¶РЅС‹
- * С‚РѕР»СЊРєРѕ С‡С‚РµРЅРёРµ, `at`, `forEach` Рё РёС‚РµСЂР°С†РёСЏ.
+ * Minimal array shape for Colyseus arrays. `ArraySchema` implements `Array`,
+ * but its `concat`/`map` signatures are narrower than `ReadonlyArray`.
+ * The client only needs indexed access, `at`, `forEach`, and iteration.
  */
 export interface WireArray<T> {
     readonly [index: number]: T;
@@ -32,7 +33,7 @@ export interface CardWire {
     name: string;
     text: string;
 }
-/** Р“Р»РѕР±Р°Р»СЊРЅРѕРµ РєР°СЂС‚РѕС‡РЅРѕРµ РїСЂР°РІРёР»Рѕ РїР°СЂС‚РёРё (ADR-013/014/015). */
+/** Global card rule for a match (ADR-013/014/015). */
 export interface RuleWire {
     id: string;
     cardId: CardId;
@@ -40,7 +41,7 @@ export interface RuleWire {
     value: string;
     ownerId: string;
 }
-/** РџСѓР±Р»РёС‡РЅР°СЏ Р·Р°РїРёСЃСЊ Р¶СѓСЂРЅР°Р»Р° СЃРѕР±С‹С‚РёР№ (ADR-008/009). */
+/** Public game log entry (ADR-008/009). */
 export interface EventWire {
     seq: number;
     kind: GameEventKind;
@@ -61,14 +62,14 @@ export interface PlayerWire {
     reconnectPending: boolean;
     score: number;
     rollsLeft: number;
-    /** РЎРєРѕР»СЊРєРѕ Р±СЂРѕСЃРєРѕРІ Р±С‹Р»Рѕ РІ РЅР°С‡Р°Р»Рµ С‚РµРєСѓС‰РµРіРѕ С…РѕРґР° (РІРєР»СЋС‡Р°СЏ РЅР°РєРѕРїР»РµРЅРЅС‹Рµ). */
+    /** Number of rolls at the start of the current turn, including banked rolls. */
     turnRolls: number;
-    /** РќР°РєРѕРїР»РµРЅРЅС‹Рµ РїРµСЂРµР±СЂРѕСЃС‹, РїРµСЂРµРЅРµСЃС‘РЅРЅС‹Рµ РЅР° СЃР»РµРґСѓСЋС‰РёР№ С…РѕРґ. */
+    /** Banked rerolls carried over to the next turn. */
     bonusRolls: number;
-    /** РћС‡РєРё, СЃРїРёСЃР°РЅРЅС‹Рµ Р·Р° РїР»Р°С‚РЅС‹Рµ РїРµСЂРµР±СЂРѕСЃС‹ РІ СЌС‚РѕРј С…РѕРґСѓ. */
+    /** Points deducted for paid rerolls during this turn. */
     turnPenalty: number;
     hasRolled: boolean;
-    /** РРіСЂРѕРє СѓР¶Рµ СЂР°Р·С‹РіСЂР°Р» РєР°СЂС‚Сѓ РІ СЌС‚РѕРј С…РѕРґСѓ (Р»РёРјРёС‚ вЂ” РѕРґРЅР° РєР°СЂС‚Р°). */
+    /** The player has already played a card this turn (limit: one card). */
     cardPlayedThisTurn: boolean;
     keepDice: WireArray<boolean>;
     dice: WireArray<number>;
@@ -86,11 +87,11 @@ export interface GameStateWire {
     phase: Phase;
     round: number;
     activePlayerId: string;
-    /** РќР°СЃС‚СЂРѕРµРЅРЅР°СЏ РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ РѕР±С‹С‡РЅРѕРіРѕ С…РѕРґР°; grace period РѕС‚РєР»СЋС‡РµРЅРёСЏ РѕС‚РґРµР»СЊРЅС‹Р№. */
+    /** Configured normal turn duration; the disconnect grace period is separate. */
     turnDurationSeconds: number;
-    /** РћС‚РєР»СЋС‡Р°РµС‚ С‚Р°Р№РјР°СѓС‚ РѕР±С‹С‡РЅРѕРіРѕ С…РѕРґР°, РЅРѕ РЅРµ grace period РґРёСЃРєРѕРЅРЅРµРєС‚Р°. */
+    /** Disables the normal turn timeout, but not the disconnect grace period. */
     turnTimerEnabled: boolean;
-    /** РЎРєРѕР»СЊРєРѕ СЃРµРєСѓРЅРґ РѕСЃС‚Р°Р»РѕСЃСЊ РЅР° С…РѕРґ. РўРёРєР°РµС‚ С‚РѕР»СЊРєРѕ СЃРµСЂРІРµСЂ. */
+    /** Seconds left in the turn. Ticked by the server only. */
     turnSecondsLeft: number;
     rules: WireArray<RuleWire>;
     events: WireArray<EventWire>;

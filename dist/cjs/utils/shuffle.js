@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shuffle = shuffle;
 /**
- * Перемешивание Фишера—Йетса. Возвращает новый массив, не мутируя исходный.
- * `random` параметризован, чтобы тесты были детерминированными.
+ * Fisher-Yates shuffle. Returns a new array and does not mutate the input.
+ * `random` is injectable so tests can be deterministic.
  */
 function shuffle(items, random = Math.random) {
     const result = [...items];

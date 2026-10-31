@@ -27,7 +27,7 @@ export interface GameState {
   players: PlayerState[];
   activePlayerId: PlayerId | null;
   phase: Phase;
-  phaseEndsAt: number; // ms (серверное)
+  phaseEndsAt: number; // ms (server time)
   turnNumber: number;
   categoryForRound?: Category;
   deck: CardId[];

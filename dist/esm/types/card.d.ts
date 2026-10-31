@@ -8,17 +8,18 @@ export interface EffectDefinition {
     params?: Record<string, unknown>;
 }
 /**
- * Аспект игрового правила (ADR-013/015). Правило глобально: действует на всех
- * игроков до конца партии, пока его не перекроет карта того же аспекта.
- * Новое правило того же аспекта заменяет предыдущее; разные аспекты сосуществуют.
+ * Game rule aspect (ADR-013/015). Rules are global: they affect all players
+ * until the end of the match, until a card with the same aspect replaces them.
+ * A new rule of the same aspect replaces the previous one; different aspects
+ * coexist.
  */
 export type RuleAspect = "freeze-count" | "freeze-parity" | "freeze-pick" | "reroll-limit" | "reroll-cost" | "reroll-accumulate" | "joker-face" | "banned-face" | "extra-die" | "die-multiplier" | "score-inversion" | "seven-triple" | "first-roll-double" | "target-category-double" | "all-rolls-bonus";
 export interface CardRuleSpec {
     aspect: RuleAspect;
-    /** Значение по умолчанию, если карта не требует выбора игрока. */
+    /** Default value when the card does not require a player choice. */
     value?: string;
 }
-/** Разовое действие карты, не создающее постоянного правила. */
+/** One-shot card action that does not create a persistent rule. */
 export type CardAction = "swap-category";
 export interface Card {
     id: CardId;
@@ -28,7 +29,7 @@ export interface Card {
     effects: EffectDefinition[];
     rule?: CardRuleSpec;
     action?: CardAction;
-    /** Карте нужен выбор игрока (значение кубика или категория). */
+    /** The card requires a player choice (die value, category, or category pair). */
     choice?: "die" | "category" | "category-pair";
 }
 export interface ActiveEffect {

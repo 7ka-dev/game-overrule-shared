@@ -1,11 +1,11 @@
 /**
- * Правила хода. Чистые функции — тестируются без Colyseus и без UI.
+ * Turn rules. Pure functions, testable without Colyseus or UI.
  */
 
-/** Максимум бросков за ход (GDD §2). */
+/** Maximum rolls per turn (GDD §2). */
 export const MAX_ROLLS = 3;
 
-/** Длительность хода одного игрока, секунды (GDD §2). */
+/** Turn duration for one player, in seconds (GDD §2). */
 export const TURN_SECONDS = 20;
 export const MIN_TURN_SECONDS = 10;
 export const MAX_TURN_SECONDS = 60;
@@ -24,11 +24,11 @@ export function adjustTurnSeconds(currentSeconds: number, deltaSeconds: number, 
   return Math.min(maxSeconds, Math.max(0, currentSeconds + deltaSeconds));
 }
 
-/** Задержка перед автоматическим ходом отключившегося игрока (ADR-002). */
+/** Delay before autoplay takes over for a disconnected player (ADR-002). */
 export const DISCONNECT_GRACE_SECONDS = 5;
 export const RECONNECT_WINDOW_SECONDS = 60;
 
-/** Следующий индекс по кругу. -1 на входе означает «активного ещё нет». */
+/** Next index in the circle. An input of -1 means there is no active player yet. */
 export function nextPlayerIndex(currentIndex: number, playerCount: number): number {
   if (playerCount <= 0) {
     return -1;
@@ -40,13 +40,13 @@ export function nextPlayerIndex(currentIndex: number, playerCount: number): numb
 }
 
 /**
- * После третьего броска игрок обязан записать очки (GDD: «Правило 3-го броска»).
+ * After the third roll the player must commit a score (GDD: "third-roll rule").
  */
 export function isRollsExhausted(rollsLeft: number): boolean {
   return rollsLeft <= 0;
 }
 
-/** Ход вернулся к первому игроку — раунд сменился. */
+/** The turn returned to the first player, so the round is complete. */
 export function isRoundComplete(nextIndex: number): boolean {
   return nextIndex === 0;
 }

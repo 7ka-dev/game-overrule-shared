@@ -24,10 +24,10 @@ const UPPER_VALUES: Partial<Record<Category, number>> = {
   Sixes: 6,
 };
 
-// Стрит из 4 последовательных (как в GDD: "Стрит — 4 последовательных значения (30 очков)")
+// Straight of four consecutive values (GDD: "Straight: 4 consecutive values, 30 points")
 function isSmallStraight(dice: readonly number[]): boolean {
   const unique = Array.from(new Set(dice)).sort((a, b) => a - b);
-  // Проверяем наличие последовательности из 4
+  // Check whether any four consecutive values are present
   for (let i = 0; i <= unique.length - 4; i++) {
     let consecutive = true;
     for (let j = 0; j < 3; j++) {
@@ -44,7 +44,7 @@ function isSmallStraight(dice: readonly number[]): boolean {
 function isFullHouse(dice: readonly number[]): boolean {
   const freq = getFrequencies(dice);
   const counts = Object.values(freq).sort((a, b) => b - a);
-  // 3+2
+  // 3 + 2
   return counts.length === 2 && counts[0] === 3 && counts[1] === 2;
 }
 
@@ -68,10 +68,10 @@ function hasFourOfAKind(dice: readonly number[]): boolean {
 }
 
 /**
- * Базовые очки категории.
+ * Base score for a category.
  *
- * `actual` определяет, какая комбинация выпала (её нельзя «подменить»
- * инверсией), а `values` — значения граней для начисления очков.
+ * `actual` determines which combination was rolled (it cannot be changed by
+ * inversion), while `values` contains the faces used for scoring.
  */
 function scoreCategoryValues(
   actual: readonly number[],
@@ -117,13 +117,13 @@ export function scoreCategory(
 }
 
 export interface ScoreModifiers {
-  /** Слоты, которые считаются джокерами (wildcard). */
+  /** Slots treated as jokers (wildcards). */
   wildDice?: readonly boolean[];
-  /** Грани, которые считаются джокерами. */
+  /** Faces treated as jokers. */
   jokerFaces?: readonly number[];
-  /** Инверсия граней при подсчёте: 1↔6, 2↔5, 3↔4. */
+  /** Invert faces during scoring: 1↔6, 2↔5, 3↔4. */
   invert?: boolean;
-  /** Кубики с выбранной гранью умножают итог вместо сложения. */
+  /** Dice with the selected face multiply the total instead of adding to it. */
   dieMultiplierFace?: number | null;
 }
 
@@ -141,8 +141,8 @@ function applyDieMultiplier(
   const sumsAll = category === "Chance";
 
   if (target === undefined && !sumsAll) {
-    // Для фиксированных комбинаций кубик «идёт в зачёт», если комбинация
-    // собрана и в ней есть кубик с выбранной гранью.
+    // For fixed combinations the die counts if the combination is complete
+    // and contains a die with the selected face.
     return dice.includes(face) ? base * 2 : base;
   }
 
@@ -150,8 +150,8 @@ function applyDieMultiplier(
     return base;
   }
 
-  // Умножает первый кубик с выбранной гранью: его вклад заменяется
-  // умножением итога. Остальные кубики с той же гранью складываются обычно.
+  // The first die with the selected face multiplies the total instead of
+  // adding its value. Other dice with the same face are added as usual.
   const index = dice.findIndex((value) => value === face);
   if (index === -1) {
     return base;
@@ -160,11 +160,11 @@ function applyDieMultiplier(
 }
 
 /**
- * Подсчёт очков с учётом карточных правил (ADR-014).
+ * Scores a category with card rules applied (ADR-014).
  *
- * Инверсия меняет только значения граней для начисления очков; выпавшая
- * комбинация определяется реальными кубиками (стрит остаётся стритом).
- * Базовые очки не включают бонусы за бросок — они начисляются в движке.
+ * Inversion only changes the face values used for scoring; the rolled
+ * combination is determined by the real dice (a straight remains a straight).
+ * Base scores do not include roll bonuses; the engine applies those.
  */
 export function scoreCategoryWithRules(
   dice: readonly number[],

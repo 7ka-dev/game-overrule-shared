@@ -5,8 +5,8 @@ export function hasRule(rules, aspect) {
     return ruleOf(rules, aspect) !== undefined;
 }
 /**
- * Установка правила: правило того же аспекта заменяется.
- * Возвращает новый массив, исходный не мутируется.
+ * Applies a rule: an existing rule with the same aspect is replaced.
+ * Returns a new array and does not mutate the input.
  */
 export function upsertRule(rules, next) {
     const filtered = rules.filter((rule) => rule.aspect !== next.aspect);
@@ -21,8 +21,8 @@ export function ruleNumber(rule, fallback) {
 }
 export const DEFAULT_REROLLS = 2;
 /**
- * Сколько перебросов разрешено за ход. Карта «запрет перебросов» даёт 0,
- * «только один переброс» — 1.
+ * Number of rerolls allowed per turn. The "no rerolls" card yields 0,
+ * "only one reroll" yields 1.
  */
 export function rerollLimit(rules) {
     return ruleNumber(ruleOf(rules, "reroll-limit"), DEFAULT_REROLLS);

@@ -9,7 +9,7 @@ export interface PlayerState {
   name: string;
   dice: DiceArray;
   rollsLeft: number; // 3,2,1,0
-  hand: Card[]; // макс 4
+  hand: Card[]; // max 4
   scoreSheet: Record<Category, ScoreValue>;
   hasDisconnected: boolean;
   autoPlayed: boolean;

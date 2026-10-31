@@ -1,21 +1,21 @@
 import type { Category, UpperCategory, LowerCategory } from "../types/category.js";
 export declare function scoreCategory(dice: readonly number[], category: Category, wildChanceValue?: number): number;
 export interface ScoreModifiers {
-    /** Слоты, которые считаются джокерами (wildcard). */
+    /** Slots treated as jokers (wildcards). */
     wildDice?: readonly boolean[];
-    /** Грани, которые считаются джокерами. */
+    /** Faces treated as jokers. */
     jokerFaces?: readonly number[];
-    /** Инверсия граней при подсчёте: 1↔6, 2↔5, 3↔4. */
+    /** Invert faces during scoring: 1↔6, 2↔5, 3↔4. */
     invert?: boolean;
-    /** Кубики с выбранной гранью умножают итог вместо сложения. */
+    /** Dice with the selected face multiply the total instead of adding to it. */
     dieMultiplierFace?: number | null;
 }
 /**
- * Подсчёт очков с учётом карточных правил (ADR-014).
+ * Scores a category with card rules applied (ADR-014).
  *
- * Инверсия меняет только значения граней для начисления очков; выпавшая
- * комбинация определяется реальными кубиками (стрит остаётся стритом).
- * Базовые очки не включают бонусы за бросок — они начисляются в движке.
+ * Inversion only changes the face values used for scoring; the rolled
+ * combination is determined by the real dice (a straight remains a straight).
+ * Base scores do not include roll bonuses; the engine applies those.
  */
 export declare function scoreCategoryWithRules(dice: readonly number[], category: Category, modifiers?: ScoreModifiers): number;
 export declare function scoreUpperCategories(dice: readonly number[]): Record<UpperCategory, number>;
