@@ -14,9 +14,10 @@ contract used by both the client and the Colyseus server.
 | `src/wire.ts` | Wire-state shape for the Colyseus room + room name constants |
 
 The package contains **no IO, no DOM, no Colyseus dependency**. The wire
-contract is deliberately a plain TypeScript interface: the client uses
-`@colyseus/schema` 5 while the server uses Colyseus 0.17 / schema 4, so the
-schema classes live on the server and are checked against `GameStateWire`.
+contract is deliberately a plain TypeScript interface: the client and server
+both use Colyseus 0.17 today, but keeping the contract schema-agnostic avoids
+coupling this package to a schema version. Schema classes live on the server
+and are checked against `GameStateWire` at build time.
 
 ## Build
 
