@@ -17,7 +17,7 @@ function card(
   text: string,
   playableIn: Phase[],
   rule?: CardRuleSpec,
-  extra?: Pick<Card, "action" | "choice" | "actionValue">,
+  extra?: Pick<Card, "action" | "choice" | "actionValue" | "target">,
 ): Card {
   return { id, name, text, playableIn, effects: [], rule, ...extra };
 }
@@ -28,7 +28,7 @@ const gameCard = (
   name: string,
   text: string,
   rule: CardRuleSpec | undefined,
-  extra?: Pick<Card, "action" | "choice" | "actionValue"> & { playableIn?: Phase[] },
+  extra?: Pick<Card, "action" | "choice" | "actionValue" | "target"> & { playableIn?: Phase[] },
 ): Card => {
   const { playableIn = ["Roll", "Decision", "Commit"], ...rest } = extra ?? {};
   return card(id, name, text, playableIn, rule, rest);
@@ -333,6 +333,15 @@ export const CARD_CATALOG: readonly Card[] = [
     "То же, но дополнительная комбинация из «6»",
     undefined,
     { action: "sheet-extra-category", actionValue: "Sixes", choice: "category" },
+  ),
+
+  // ── Hand and trade ────────────────────────────────────────────────────────
+  gameCard(
+    "trade-cards",
+    "Обмен протоколами",
+    "Отдай 2 свои оставшиеся карты любому игроку; он отдаёт 2 случайные свои; после этого можно сыграть ещё одну карту",
+    undefined,
+    { action: "trade-cards", actionValue: "2", choice: "cards", target: "any" },
   ),
 
   // ── Category swap ─────────────────────────────────────────────────────────

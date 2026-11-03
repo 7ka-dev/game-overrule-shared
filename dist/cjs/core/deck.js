@@ -93,6 +93,8 @@ exports.CARD_CATALOG = [
     gameCard("extra-yahtzee", "Второе ятци", "Замени одну комбинацию у всех на дополнительную «Ятци». Если она была собрана, очки остаются зафиксированными и её нельзя пересобрать", undefined, { action: "sheet-extra-category", actionValue: "Yahtzee", choice: "category" }),
     gameCard("extra-ones", "Вторые единицы", "То же, но дополнительная комбинация из «1»", undefined, { action: "sheet-extra-category", actionValue: "Ones", choice: "category" }),
     gameCard("extra-sixes", "Вторые шестёрки", "То же, но дополнительная комбинация из «6»", undefined, { action: "sheet-extra-category", actionValue: "Sixes", choice: "category" }),
+    // ── Hand and trade ────────────────────────────────────────────────────────
+    gameCard("trade-cards", "Обмен протоколами", "Отдай 2 свои оставшиеся карты любому игроку; он отдаёт 2 случайные свои; после этого можно сыграть ещё одну карту", undefined, { action: "trade-cards", actionValue: "2", choice: "cards", target: "any" }),
     // ── Category swap ─────────────────────────────────────────────────────────
     gameCard("swap-category", "Замена", "Поменяй местами две комбинации: статус и очки переходят", undefined, { action: "swap-category", choice: "category-pair" }),
 ];

@@ -95,6 +95,8 @@ export interface PlayerWire {
   cardPlayedThisTurn: boolean;
   /** Number of cards played this turn; optional until multi-card rules land. */
   cardsPlayedThisTurn?: number;
+  /** Extra card plays granted by a successful trade. */
+  bonusCardPlaysThisTurn?: number;
   /** Face selected for reroll-face-limit; 0 means not selected. */
   rerollFace?: number;
   keepDice: WireArray<boolean>;
