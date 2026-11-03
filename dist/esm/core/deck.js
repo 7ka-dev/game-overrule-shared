@@ -76,6 +76,12 @@ export const CARD_CATALOG = [
     gameCard("cancel-all", "Полная нейтрализация", "Отмени все наложенные правила", undefined, { action: "cancel-all-rules" }),
     gameCard("standings", "Уравнитель", "Единственный лидер не может играть протоколы; единственный последний может сыграть два за ход; при ничье правило молчит", rule("standings-card-limit")),
     gameCard("first-round-lock", "Немой первый круг", "В первом круге протоколы нельзя играть", rule("card-lock-round", "1")),
+    // ── Turn and round state ──────────────────────────────────────────────────
+    gameCard("relay", "Эстафета", "Ход начинается с кубиков предыдущего игрока", rule("turn-start-dice", "previous")),
+    gameCard("hidden-all", "Слепой эксперимент", "Активный игрок не видит свои кубики до фиксации; остальные видят; очки считаются правильно", rule("hidden-dice", "all")),
+    gameCard("hidden-first-three", "Частичная слепота", "Активный игрок не видит первые 3 свои кубика до фиксации; остальные видят", rule("hidden-dice", "first-three")),
+    gameCard("one-face", "Одна грань", "За ход можно перебрасывать кубики только одного значения", rule("reroll-face-limit")),
+    gameCard("round-suit", "Масть круга", "Первая закрытая категория круга задаёт масть; кто повторит — ×2, кто закроет другую — −5", rule("round-suit")),
     // ── Category swap ─────────────────────────────────────────────────────────
     gameCard("swap-category", "Замена", "Поменяй местами две комбинации: статус и очки переходят", undefined, { action: "swap-category", choice: "category-pair" }),
 ];

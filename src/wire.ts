@@ -94,6 +94,8 @@ export interface PlayerWire {
   cardPlayedThisTurn: boolean;
   /** Number of cards played this turn; optional until multi-card rules land. */
   cardsPlayedThisTurn?: number;
+  /** Face selected for reroll-face-limit; 0 means not selected. */
+  rerollFace?: number;
   keepDice: WireArray<boolean>;
   dice: WireArray<number>;
   wildDice: WireArray<boolean>;
@@ -123,6 +125,10 @@ export interface GameStateWire {
   previousCategory?: Category | "";
   /** First category closed in the current round; optional until round-suit lands. */
   roundSuitCategory?: Category | "";
+  /** Player who closed the first category of the round. */
+  roundSuitOwnerId?: string;
+  /** Round number in which the suit was set. */
+  roundSuitRound?: number;
   rules: WireArray<RuleWire>;
   events: WireArray<EventWire>;
   players: WireArray<PlayerWire>;

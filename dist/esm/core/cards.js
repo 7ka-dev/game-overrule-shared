@@ -13,6 +13,32 @@ export function cardLockRound(rules) {
     const value = ruleNumber(rule, 0);
     return Number.isInteger(value) && value > 0 ? value : null;
 }
+/** `turn-start-dice = previous`: inherit the previous player's final dice. */
+export function turnStartsFromPreviousDice(rules) {
+    return ruleOf(rules, "turn-start-dice")?.value === "previous";
+}
+/** `reroll-face-limit`: only dice of the selected face may be rerolled. */
+export function hasRerollFaceLimit(rules) {
+    return ruleOf(rules, "reroll-face-limit") !== undefined;
+}
+export function hiddenDiceMode(rules) {
+    const rule = ruleOf(rules, "hidden-dice");
+    if (rule?.value === "all" || rule?.value === "first-three") {
+        return rule.value;
+    }
+    return null;
+}
+/**
+ * Client-side mask from ADR-020. Other players and spectators still see the
+ * real dice; only the active player's own view is masked.
+ */
+export function hiddenDiceMask(rules, diceCount, viewerIsActive) {
+    const mode = hiddenDiceMode(rules);
+    if (!mode || !viewerIsActive) {
+        return Array.from({ length: diceCount }, () => false);
+    }
+    return Array.from({ length: diceCount }, (_, index) => mode === "all" || index < 3);
+}
 /**
  * Per-turn protocol limit.
  *

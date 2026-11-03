@@ -18,6 +18,9 @@ export type ClientToServer = {
     type: "KEEP_DICE";
     indices: number[];
 } | {
+    type: "SET_REROLL_FACE";
+    face: number;
+} | {
     type: "DISCARD";
     cardId: CardId;
 } | {

@@ -157,6 +157,8 @@ export interface ScoreContext {
   allPlayers?: readonly ScorePlayerContext[];
   /** Category closed by the previous turn, for repeat-category-double. */
   previousCategory?: Category | null;
+  /** First category closed in the round, for round-suit. */
+  roundSuitCategory?: Category | null;
 }
 
 /** Reads the active face transform. A legacy empty value means inversion. */
@@ -317,6 +319,12 @@ export function scoreWithRules(context: ScoreContext): number {
   ) {
     multiplier *= 2;
   }
+  const roundSuit = ruleOf(rules, "round-suit")
+    ? context.roundSuitCategory ?? null
+    : null;
+  if (roundSuit === category) {
+    multiplier *= 2;
+  }
   score *= multiplier;
 
   // "All rolls used" is a relative +50% bonus, so it belongs to the additive
@@ -348,6 +356,10 @@ export function scoreWithRules(context: ScoreContext): number {
   const takenPenalty = ruleOf(rules, "taken-category-penalty");
   if (taken && takenPenalty) {
     score -= ruleNumber(takenPenalty, 3);
+  }
+
+  if (roundSuit && roundSuit !== category) {
+    score -= 5;
   }
 
   const frozenPenalty = ruleOf(rules, "frozen-penalty");

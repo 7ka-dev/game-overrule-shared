@@ -219,6 +219,12 @@ export function scoreWithRules(context) {
         context.previousCategory === category) {
         multiplier *= 2;
     }
+    const roundSuit = ruleOf(rules, "round-suit")
+        ? context.roundSuitCategory ?? null
+        : null;
+    if (roundSuit === category) {
+        multiplier *= 2;
+    }
     score *= multiplier;
     // "All rolls used" is a relative +50% bonus, so it belongs to the additive
     // stage after multipliers rather than to the fixed base score.
@@ -246,6 +252,9 @@ export function scoreWithRules(context) {
     const takenPenalty = ruleOf(rules, "taken-category-penalty");
     if (taken && takenPenalty) {
         score -= ruleNumber(takenPenalty, 3);
+    }
+    if (roundSuit && roundSuit !== category) {
+        score -= 5;
     }
     const frozenPenalty = ruleOf(rules, "frozen-penalty");
     if (frozenPenalty) {

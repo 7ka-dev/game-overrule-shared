@@ -28,6 +28,44 @@ export function cardLockRound(rules: readonly ActiveRule[]): number | null {
   return Number.isInteger(value) && value > 0 ? value : null;
 }
 
+/** `turn-start-dice = previous`: inherit the previous player's final dice. */
+export function turnStartsFromPreviousDice(rules: readonly ActiveRule[]): boolean {
+  return ruleOf(rules, "turn-start-dice")?.value === "previous";
+}
+
+/** `reroll-face-limit`: only dice of the selected face may be rerolled. */
+export function hasRerollFaceLimit(rules: readonly ActiveRule[]): boolean {
+  return ruleOf(rules, "reroll-face-limit") !== undefined;
+}
+
+export type HiddenDiceMode = "all" | "first-three";
+
+export function hiddenDiceMode(rules: readonly ActiveRule[]): HiddenDiceMode | null {
+  const rule = ruleOf(rules, "hidden-dice");
+  if (rule?.value === "all" || rule?.value === "first-three") {
+    return rule.value;
+  }
+  return null;
+}
+
+/**
+ * Client-side mask from ADR-020. Other players and spectators still see the
+ * real dice; only the active player's own view is masked.
+ */
+export function hiddenDiceMask(
+  rules: readonly ActiveRule[],
+  diceCount: number,
+  viewerIsActive: boolean,
+): boolean[] {
+  const mode = hiddenDiceMode(rules);
+  if (!mode || !viewerIsActive) {
+    return Array.from({ length: diceCount }, () => false);
+  }
+  return Array.from({ length: diceCount }, (_, index) =>
+    mode === "all" || index < 3,
+  );
+}
+
 /**
  * Per-turn protocol limit.
  *

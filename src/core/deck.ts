@@ -268,6 +268,38 @@ export const CARD_CATALOG: readonly Card[] = [
     rule("card-lock-round", "1"),
   ),
 
+  // ── Turn and round state ──────────────────────────────────────────────────
+  gameCard(
+    "relay",
+    "Эстафета",
+    "Ход начинается с кубиков предыдущего игрока",
+    rule("turn-start-dice", "previous"),
+  ),
+  gameCard(
+    "hidden-all",
+    "Слепой эксперимент",
+    "Активный игрок не видит свои кубики до фиксации; остальные видят; очки считаются правильно",
+    rule("hidden-dice", "all"),
+  ),
+  gameCard(
+    "hidden-first-three",
+    "Частичная слепота",
+    "Активный игрок не видит первые 3 свои кубика до фиксации; остальные видят",
+    rule("hidden-dice", "first-three"),
+  ),
+  gameCard(
+    "one-face",
+    "Одна грань",
+    "За ход можно перебрасывать кубики только одного значения",
+    rule("reroll-face-limit"),
+  ),
+  gameCard(
+    "round-suit",
+    "Масть круга",
+    "Первая закрытая категория круга задаёт масть; кто повторит — ×2, кто закроет другую — −5",
+    rule("round-suit"),
+  ),
+
   // ── Category swap ─────────────────────────────────────────────────────────
   gameCard(
     "swap-category",

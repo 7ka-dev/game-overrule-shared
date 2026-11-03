@@ -2,6 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cardTiming = cardTiming;
 exports.cardLockRound = cardLockRound;
+exports.turnStartsFromPreviousDice = turnStartsFromPreviousDice;
+exports.hasRerollFaceLimit = hasRerollFaceLimit;
+exports.hiddenDiceMode = hiddenDiceMode;
+exports.hiddenDiceMask = hiddenDiceMask;
 exports.maxCardsPerTurn = maxCardsPerTurn;
 const rules_js_1 = require("./rules.js");
 /** `card-timing = before-roll`: cards may only be played before the first roll. */
@@ -17,6 +21,32 @@ function cardLockRound(rules) {
     }
     const value = (0, rules_js_1.ruleNumber)(rule, 0);
     return Number.isInteger(value) && value > 0 ? value : null;
+}
+/** `turn-start-dice = previous`: inherit the previous player's final dice. */
+function turnStartsFromPreviousDice(rules) {
+    return (0, rules_js_1.ruleOf)(rules, "turn-start-dice")?.value === "previous";
+}
+/** `reroll-face-limit`: only dice of the selected face may be rerolled. */
+function hasRerollFaceLimit(rules) {
+    return (0, rules_js_1.ruleOf)(rules, "reroll-face-limit") !== undefined;
+}
+function hiddenDiceMode(rules) {
+    const rule = (0, rules_js_1.ruleOf)(rules, "hidden-dice");
+    if (rule?.value === "all" || rule?.value === "first-three") {
+        return rule.value;
+    }
+    return null;
+}
+/**
+ * Client-side mask from ADR-020. Other players and spectators still see the
+ * real dice; only the active player's own view is masked.
+ */
+function hiddenDiceMask(rules, diceCount, viewerIsActive) {
+    const mode = hiddenDiceMode(rules);
+    if (!mode || !viewerIsActive) {
+        return Array.from({ length: diceCount }, () => false);
+    }
+    return Array.from({ length: diceCount }, (_, index) => mode === "all" || index < 3);
 }
 /**
  * Per-turn protocol limit.

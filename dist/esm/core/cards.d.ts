@@ -13,6 +13,17 @@ export interface StandingsPlayer {
 export declare function cardTiming(rules: readonly ActiveRule[]): "before-roll" | null;
 /** `card-lock-round = N`: no cards while the current round is <= N. */
 export declare function cardLockRound(rules: readonly ActiveRule[]): number | null;
+/** `turn-start-dice = previous`: inherit the previous player's final dice. */
+export declare function turnStartsFromPreviousDice(rules: readonly ActiveRule[]): boolean;
+/** `reroll-face-limit`: only dice of the selected face may be rerolled. */
+export declare function hasRerollFaceLimit(rules: readonly ActiveRule[]): boolean;
+export type HiddenDiceMode = "all" | "first-three";
+export declare function hiddenDiceMode(rules: readonly ActiveRule[]): HiddenDiceMode | null;
+/**
+ * Client-side mask from ADR-020. Other players and spectators still see the
+ * real dice; only the active player's own view is masked.
+ */
+export declare function hiddenDiceMask(rules: readonly ActiveRule[], diceCount: number, viewerIsActive: boolean): boolean[];
 /**
  * Per-turn protocol limit.
  *

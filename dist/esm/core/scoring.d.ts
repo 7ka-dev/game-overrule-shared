@@ -35,6 +35,8 @@ export interface ScoreContext {
     allPlayers?: readonly ScorePlayerContext[];
     /** Category closed by the previous turn, for repeat-category-double. */
     previousCategory?: Category | null;
+    /** First category closed in the round, for round-suit. */
+    roundSuitCategory?: Category | null;
 }
 /** Reads the active face transform. A legacy empty value means inversion. */
 export declare function scoreInversionMode(rules: readonly ActiveRule[]): ScoreInversionMode | null;
