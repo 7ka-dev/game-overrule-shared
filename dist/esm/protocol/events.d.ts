@@ -9,6 +9,10 @@ export type ClientToServer = {
         face?: number;
         category?: string;
         category2?: string;
+        ruleId?: string;
+        ruleIds?: string[];
+        targetId?: string;
+        cardIds?: CardId[];
     };
 } | {
     type: "KEEP_DICE";

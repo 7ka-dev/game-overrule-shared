@@ -8,7 +8,15 @@ export type ClientToServer =
   | {
       type: "PLAY_CARD";
       cardId: CardId;
-      params?: { face?: number; category?: string; category2?: string };
+      params?: {
+        face?: number;
+        category?: string;
+        category2?: string;
+        ruleId?: string;
+        ruleIds?: string[];
+        targetId?: string;
+        cardIds?: CardId[];
+      };
     }
   | { type: "KEEP_DICE"; indices: number[] }
   | { type: "DISCARD"; cardId: CardId }

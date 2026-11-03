@@ -55,10 +55,24 @@ export interface EventWire {
   cardId: CardId | "";
   aspect: RuleAspect | "";
   replaced: boolean;
+  ruleId?: string;
+  targetId?: string;
+  cardIds?: WireArray<CardId>;
   category: Category | "";
+  previousCategory?: Category | "";
+  nextCategory?: Category | "";
   points: number;
   dice: WireArray<number>;
   reason: "timeout" | "disconnect" | "";
+}
+
+/** Future score-sheet slot; optional until the slot model is wired end-to-end. */
+export interface SheetSlotWire {
+  id: string;
+  kind: Category;
+  label: string;
+  score: number;
+  locked: boolean;
 }
 
 export interface PlayerWire {
@@ -78,10 +92,14 @@ export interface PlayerWire {
   hasRolled: boolean;
   /** The player has already played a card this turn (limit: one card). */
   cardPlayedThisTurn: boolean;
+  /** Number of cards played this turn; optional until multi-card rules land. */
+  cardsPlayedThisTurn?: number;
   keepDice: WireArray<boolean>;
   dice: WireArray<number>;
   wildDice: WireArray<boolean>;
   sheet: ReadonlyMap<string, number>;
+  /** Future dynamic sheet; optional until task 035 wires it end-to-end. */
+  sheetSlots?: WireArray<SheetSlotWire>;
   hand: WireArray<CardWire>;
   pendingDiscard: boolean;
   discardSecondsLeft: number;
@@ -101,6 +119,10 @@ export interface GameStateWire {
   turnTimerEnabled: boolean;
   /** Seconds left in the turn. Ticked by the server only. */
   turnSecondsLeft: number;
+  /** Last committed category; optional until repeat/overwrite rules land. */
+  previousCategory?: Category | "";
+  /** First category closed in the current round; optional until round-suit lands. */
+  roundSuitCategory?: Category | "";
   rules: WireArray<RuleWire>;
   events: WireArray<EventWire>;
   players: WireArray<PlayerWire>;

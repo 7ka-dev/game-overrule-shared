@@ -12,7 +12,11 @@ export type GameEventKind =
   | "disconnect"
   | "reconnect"
   | "autoplay"
-  | "game-over";
+  | "game-over"
+  | "rule-cancelled"
+  | "card-discarded"
+  | "cards-traded"
+  | "category-overwritten";
 
 /**
  * Game log entry (ADR-008: the log is part of the authoritative state).
@@ -31,8 +35,18 @@ export interface GameLogEvent {
   aspect?: RuleAspect;
   /** The card replaced an existing rule of the same aspect. */
   replaced?: boolean;
+  /** Cancelled rule id (for `rule-cancelled`). */
+  ruleId?: string;
+  /** Other player involved in a trade. */
+  targetId?: PlayerId;
+  /** Cards moved by a trade or discard; never hidden hands in public state. */
+  cardIds?: CardId[];
   /** Filled category (for `commit`). */
   category?: Category;
+  /** Previous category for overwrite/repeat rules. */
+  previousCategory?: Category;
+  /** New category for overwrite/extra-slot rules. */
+  nextCategory?: Category;
   /** Awarded points (for `commit`). */
   points?: number;
   /** Dice values from a roll or the final combination (`roll`, `commit`). */
