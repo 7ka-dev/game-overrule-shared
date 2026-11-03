@@ -66,12 +66,13 @@ export interface EventWire {
   reason: "timeout" | "disconnect" | "";
 }
 
-/** Future score-sheet slot; optional until the slot model is wired end-to-end. */
+/** Score-sheet slot; `filled` distinguishes an empty slot from a zero score. */
 export interface SheetSlotWire {
   id: string;
   kind: Category;
   label: string;
   score: number;
+  filled: boolean;
   locked: boolean;
 }
 

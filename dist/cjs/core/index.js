@@ -23,3 +23,4 @@ __exportStar(require("./categories.js"), exports);
 __exportStar(require("./turn.js"), exports);
 __exportStar(require("./deck.js"), exports);
 __exportStar(require("./cards.js"), exports);
+__exportStar(require("./sheet.js"), exports);
