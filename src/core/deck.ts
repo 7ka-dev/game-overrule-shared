@@ -300,6 +300,41 @@ export const CARD_CATALOG: readonly Card[] = [
     rule("round-suit"),
   ),
 
+  // ── Sheet changes ─────────────────────────────────────────────────────────
+  gameCard(
+    "sheet-overwrite-zero",
+    "Чистый лист",
+    "Можно перезаписывать комбинации с 0. Игра заканчивается, когда есть игрок со всеми заполненными строками",
+    rule("sheet-overwrite", "zero"),
+  ),
+  gameCard(
+    "sheet-overwrite-any",
+    "Переписать протокол",
+    "Можно перезаписывать комбинации. Игра заканчивается, когда есть игрок со всеми заполненными строками",
+    rule("sheet-overwrite", "any"),
+  ),
+  gameCard(
+    "extra-yahtzee",
+    "Второе ятци",
+    "Замени одну комбинацию у всех на дополнительную «Ятци». Если она была собрана, очки остаются зафиксированными и её нельзя пересобрать",
+    undefined,
+    { action: "sheet-extra-category", actionValue: "Yahtzee", choice: "category" },
+  ),
+  gameCard(
+    "extra-ones",
+    "Вторые единицы",
+    "То же, но дополнительная комбинация из «1»",
+    undefined,
+    { action: "sheet-extra-category", actionValue: "Ones", choice: "category" },
+  ),
+  gameCard(
+    "extra-sixes",
+    "Вторые шестёрки",
+    "То же, но дополнительная комбинация из «6»",
+    undefined,
+    { action: "sheet-extra-category", actionValue: "Sixes", choice: "category" },
+  ),
+
   // ── Category swap ─────────────────────────────────────────────────────────
   gameCard(
     "swap-category",

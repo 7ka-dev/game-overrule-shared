@@ -22,7 +22,11 @@ export type ClientToServer =
   | { type: "SET_REROLL_FACE"; face: number }
   | { type: "DISCARD"; cardId: CardId }
   | { type: "DISCARD_TO_DECK"; cardId: CardId }
-  | { type: "COMMIT_SCORE"; category: import("../types/category").Category }
+  | {
+      type: "COMMIT_SCORE";
+      category: import("../types/category").Category;
+      slotId?: string;
+    }
   | { type: "FORCED_DISCARD"; cardId: CardId };
 
 // Server-to-client messages

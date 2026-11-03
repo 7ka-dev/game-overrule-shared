@@ -48,8 +48,15 @@ export function takenCategoriesFromSlots(slots: readonly SheetSlot[]): Category[
 }
 
 export function isSheetCompleteSlots(slots: readonly SheetSlot[]): boolean {
-  return SCORE_CATEGORIES.every((category) => {
-    const slot = sheetSlot(slots, category);
-    return slot?.score !== undefined && slot.score !== null;
-  });
+  return slots.length > 0 && slots.every((slot) => slot.score !== undefined && slot.score !== null);
+}
+
+const EXTRA_CATEGORY_LABELS: Partial<Record<Category, string>> = {
+  Yahtzee: "Ятци II",
+  Ones: "Единицы II",
+  Sixes: "Шестёрки II",
+};
+
+export function extraCategoryLabel(kind: Category): string {
+  return EXTRA_CATEGORY_LABELS[kind] ?? kind;
 }

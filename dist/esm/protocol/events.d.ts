@@ -29,6 +29,7 @@ export type ClientToServer = {
 } | {
     type: "COMMIT_SCORE";
     category: import("../types/category").Category;
+    slotId?: string;
 } | {
     type: "FORCED_DISCARD";
     cardId: CardId;

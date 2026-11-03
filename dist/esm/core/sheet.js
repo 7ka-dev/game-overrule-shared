@@ -34,8 +34,13 @@ export function takenCategoriesFromSlots(slots) {
     return taken;
 }
 export function isSheetCompleteSlots(slots) {
-    return SCORE_CATEGORIES.every((category) => {
-        const slot = sheetSlot(slots, category);
-        return slot?.score !== undefined && slot.score !== null;
-    });
+    return slots.length > 0 && slots.every((slot) => slot.score !== undefined && slot.score !== null);
+}
+const EXTRA_CATEGORY_LABELS = {
+    Yahtzee: "Ятци II",
+    Ones: "Единицы II",
+    Sixes: "Шестёрки II",
+};
+export function extraCategoryLabel(kind) {
+    return EXTRA_CATEGORY_LABELS[kind] ?? kind;
 }

@@ -5,6 +5,7 @@ exports.sheetSlot = sheetSlot;
 exports.sheetSlotsToRecord = sheetSlotsToRecord;
 exports.takenCategoriesFromSlots = takenCategoriesFromSlots;
 exports.isSheetCompleteSlots = isSheetCompleteSlots;
+exports.extraCategoryLabel = extraCategoryLabel;
 const categories_js_1 = require("./categories.js");
 /** Fresh base sheet: the ten MVP categories, each with a stable id. */
 function createBaseSheet() {
@@ -41,8 +42,13 @@ function takenCategoriesFromSlots(slots) {
     return taken;
 }
 function isSheetCompleteSlots(slots) {
-    return categories_js_1.SCORE_CATEGORIES.every((category) => {
-        const slot = sheetSlot(slots, category);
-        return slot?.score !== undefined && slot.score !== null;
-    });
+    return slots.length > 0 && slots.every((slot) => slot.score !== undefined && slot.score !== null);
+}
+const EXTRA_CATEGORY_LABELS = {
+    Yahtzee: "Ятци II",
+    Ones: "Единицы II",
+    Sixes: "Шестёрки II",
+};
+function extraCategoryLabel(kind) {
+    return EXTRA_CATEGORY_LABELS[kind] ?? kind;
 }

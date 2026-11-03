@@ -8,3 +8,4 @@ export declare function sheetSlot(slots: readonly SheetSlot[], category: Categor
 export declare function sheetSlotsToRecord(slots: readonly SheetSlot[]): Partial<Record<Category, number>>;
 export declare function takenCategoriesFromSlots(slots: readonly SheetSlot[]): Category[];
 export declare function isSheetCompleteSlots(slots: readonly SheetSlot[]): boolean;
+export declare function extraCategoryLabel(kind: Category): string;
