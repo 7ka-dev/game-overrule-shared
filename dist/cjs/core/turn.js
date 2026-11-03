@@ -9,6 +9,10 @@ exports.adjustTurnSeconds = adjustTurnSeconds;
 exports.nextPlayerIndex = nextPlayerIndex;
 exports.isRollsExhausted = isRollsExhausted;
 exports.isRoundComplete = isRoundComplete;
+exports.hasRerolled = hasRerolled;
+exports.canReroll = canReroll;
+exports.mustReroll = mustReroll;
+const rules_js_1 = require("./rules.js");
 /** Maximum rolls per turn (GDD §2). */
 exports.MAX_ROLLS = 3;
 /** Turn duration for one player, in seconds (GDD §2). */
@@ -47,4 +51,28 @@ function isRollsExhausted(rollsLeft) {
 /** The turn returned to the first player, so the round is complete. */
 function isRoundComplete(nextIndex) {
     return nextIndex === 0;
+}
+/** The player has already rerolled at least once this turn. */
+function hasRerolled(state) {
+    return state.rollsLeft < state.turnRolls - 1;
+}
+/** Whether a reroll is possible under the current rule set. */
+function canReroll(state, rules) {
+    if (!state.hasRolled || state.rollsLeft <= 0) {
+        return false;
+    }
+    const used = state.turnRolls - state.rollsLeft - 1;
+    const bonus = Math.max(0, state.turnRolls - exports.MAX_ROLLS);
+    return used < (0, rules_js_1.rerollLimit)(rules) + bonus;
+}
+/**
+ * "Forced reroll" blocks committing until the first reroll. If the rules make
+ * a reroll impossible (for example, reroll-limit = 0), the card must not
+ * deadlock the turn, so committing is allowed.
+ */
+function mustReroll(state, rules) {
+    return ((0, rules_js_1.hasRule)(rules, "forced-reroll") &&
+        state.hasRolled &&
+        !hasRerolled(state) &&
+        canReroll(state, rules));
 }

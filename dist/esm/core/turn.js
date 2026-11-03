@@ -1,6 +1,7 @@
 /**
  * Turn rules. Pure functions, testable without Colyseus or UI.
  */
+import { hasRule, rerollLimit } from "./rules.js";
 /** Maximum rolls per turn (GDD §2). */
 export const MAX_ROLLS = 3;
 /** Turn duration for one player, in seconds (GDD §2). */
@@ -39,4 +40,28 @@ export function isRollsExhausted(rollsLeft) {
 /** The turn returned to the first player, so the round is complete. */
 export function isRoundComplete(nextIndex) {
     return nextIndex === 0;
+}
+/** The player has already rerolled at least once this turn. */
+export function hasRerolled(state) {
+    return state.rollsLeft < state.turnRolls - 1;
+}
+/** Whether a reroll is possible under the current rule set. */
+export function canReroll(state, rules) {
+    if (!state.hasRolled || state.rollsLeft <= 0) {
+        return false;
+    }
+    const used = state.turnRolls - state.rollsLeft - 1;
+    const bonus = Math.max(0, state.turnRolls - MAX_ROLLS);
+    return used < rerollLimit(rules) + bonus;
+}
+/**
+ * "Forced reroll" blocks committing until the first reroll. If the rules make
+ * a reroll impossible (for example, reroll-limit = 0), the card must not
+ * deadlock the turn, so committing is allowed.
+ */
+export function mustReroll(state, rules) {
+    return (hasRule(rules, "forced-reroll") &&
+        state.hasRolled &&
+        !hasRerolled(state) &&
+        canReroll(state, rules));
 }

@@ -1,3 +1,6 @@
+import { freezeConfig, frozenDiceCount } from "./freeze.js";
+import { ruleNumber, ruleOf } from "./rules.js";
+import { MAX_ROLLS } from "./turn.js";
 function getFrequencies(dice) {
     const freq = {};
     for (let i = 0; i < dice.length; i++) {
@@ -91,6 +94,29 @@ export function scoreCategory(dice, category, wildChanceValue) {
     }
     return scoreCategoryValues(dice, dice, category);
 }
+/** Reads the active face transform. A legacy empty value means inversion. */
+export function scoreInversionMode(rules) {
+    const rule = ruleOf(rules, "score-inversion");
+    if (!rule) {
+        return null;
+    }
+    if (rule.value === "shift-up" || rule.value === "shift-down") {
+        return rule.value;
+    }
+    return "invert";
+}
+function transformFace(value, mode) {
+    switch (mode) {
+        case "shift-up":
+            return value === 6 ? 1 : value + 1;
+        case "shift-down":
+            return value === 1 ? 6 : value - 1;
+        case "invert":
+            return 7 - value;
+        default:
+            return value;
+    }
+}
 function applyDieMultiplier(dice, category, face, base) {
     if (base <= 0) {
         return base;
@@ -121,8 +147,8 @@ function applyDieMultiplier(dice, category, face, base) {
  * Base scores do not include roll bonuses; the engine applies those.
  */
 export function scoreCategoryWithRules(dice, category, modifiers = {}) {
-    const inverted = modifiers.invert === true;
-    const values = inverted ? dice.map((value) => 7 - value) : [...dice];
+    const inversion = modifiers.inversionMode ?? (modifiers.invert === true ? "invert" : null);
+    const values = dice.map((value) => transformFace(value, inversion));
     const wildIndices = [];
     for (let index = 0; index < dice.length; index += 1) {
         const isWild = modifiers.wildDice?.[index] === true ||
@@ -145,7 +171,7 @@ export function scoreCategoryWithRules(dice, category, modifiers = {}) {
         }
         for (let face = 1; face <= 6; face += 1) {
             candidateActual[dieIndex] = face;
-            candidateValues[dieIndex] = inverted ? 7 - face : face;
+            candidateValues[dieIndex] = transformFace(face, inversion);
             scoreAssignments(wildIndex + 1);
         }
         candidateActual[dieIndex] = dice[dieIndex];
@@ -157,6 +183,78 @@ export function scoreCategoryWithRules(dice, category, modifiers = {}) {
         return applyDieMultiplier(dice, category, modifiers.dieMultiplierFace, base);
     }
     return base;
+}
+/**
+ * Full score pipeline, shared by the server and the client preview.
+ *
+ * Order: base → face transform → fixed bonuses → multipliers → additive
+ * bonuses → category cap → penalties → personal penalty → max(0).
+ */
+export function scoreWithRules(context) {
+    const { dice, category, rules, player } = context;
+    const allPlayers = context.allPlayers ?? [];
+    const jokerFaces = rules
+        .filter((rule) => rule.aspect === "joker-face")
+        .map((rule) => Number(rule.value));
+    const dieMultiplier = ruleOf(rules, "die-multiplier");
+    let score = scoreCategoryWithRules(dice, category, {
+        wildDice: player.wildDice,
+        jokerFaces,
+        inversionMode: scoreInversionMode(rules),
+        dieMultiplierFace: dieMultiplier !== undefined ? Number(dieMultiplier.value) : null,
+    });
+    if (ruleOf(rules, "seven-triple") && score === 7) {
+        score = 21;
+    }
+    const turnRolls = player.turnRolls ?? MAX_ROLLS;
+    const isFirstRoll = player.hasRolled === true && player.rollsLeft === turnRolls - 1;
+    let multiplier = 1;
+    if (ruleOf(rules, "first-roll-double") && isFirstRoll) {
+        multiplier *= 2;
+    }
+    if (ruleOf(rules, "target-category-double")?.value === category) {
+        multiplier *= 2;
+    }
+    if (ruleOf(rules, "repeat-category-double") &&
+        context.previousCategory === category) {
+        multiplier *= 2;
+    }
+    score *= multiplier;
+    // "All rolls used" is a relative +50% bonus, so it belongs to the additive
+    // stage after multipliers rather than to the fixed base score.
+    if (ruleOf(rules, "all-rolls-bonus") && player.rollsLeft === 0) {
+        score = Math.round(score * 1.5);
+    }
+    const taken = allPlayers.some((entry) => entry.sheet[category] !== undefined);
+    const takenBonus = ruleOf(rules, "taken-category-bonus");
+    if (taken && takenBonus) {
+        score += ruleNumber(takenBonus, 6);
+    }
+    const cap = ruleOf(rules, "category-cap");
+    if (cap?.value === "best-recorded") {
+        let best = -Infinity;
+        for (const entry of allPlayers) {
+            const recorded = entry.sheet[category];
+            if (recorded !== undefined) {
+                best = Math.max(best, recorded);
+            }
+        }
+        if (best !== -Infinity) {
+            score = Math.min(score, best);
+        }
+    }
+    const takenPenalty = ruleOf(rules, "taken-category-penalty");
+    if (taken && takenPenalty) {
+        score -= ruleNumber(takenPenalty, 3);
+    }
+    const frozenPenalty = ruleOf(rules, "frozen-penalty");
+    if (frozenPenalty) {
+        score -=
+            frozenDiceCount(dice, player.keepDice ?? [], freezeConfig(rules)) *
+                ruleNumber(frozenPenalty, 1);
+    }
+    score -= player.turnPenalty ?? 0;
+    return Math.max(0, score);
 }
 export function scoreUpperCategories(dice) {
     return {

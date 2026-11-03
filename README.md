@@ -36,7 +36,12 @@ npm run typecheck
 import {
   OVERRULE_ROOM_NAME,
   scoreCategory,
+  scoreWithRules,
   type GameStateWire,
   type Card,
 } from "game-overrule-shared";
 ```
+
+`scoreWithRules` is the single scoring pipeline shared by the authoritative
+server and the client preview: base → face transforms → fixed bonuses →
+multipliers → additive bonuses → category cap → penalties → `max(0)`.

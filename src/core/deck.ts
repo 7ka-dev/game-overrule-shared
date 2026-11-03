@@ -155,6 +155,76 @@ export const CARD_CATALOG: readonly Card[] = [
     "При подсчёте очков грани инвертируются: 1↔6, 2↔5, 3↔4",
     rule("score-inversion"),
   ),
+  gameCard(
+    "shift-up",
+    "Сдвиг вверх",
+    "При подсчёте грани сдвигаются: 1→2, …, 6→1; заменяет «Искажение»",
+    rule("score-inversion", "shift-up"),
+  ),
+  gameCard(
+    "shift-down",
+    "Сдвиг вниз",
+    "При подсчёте грани сдвигаются: 2→1, …, 1→6; заменяет «Искажение»",
+    rule("score-inversion", "shift-down"),
+  ),
+
+  // ── Score and category rules ──────────────────────────────────────────────
+  gameCard(
+    "record-cap",
+    "Планка рекорда",
+    "Очки категории не выше лучшего уже записанного результата этой категории у любого игрока; если категория не закрыта — без потолка",
+    rule("category-cap", "best-recorded"),
+  ),
+  gameCard(
+    "repeat-category",
+    "Повторный опыт",
+    "Закрыл ту же категорию, что предыдущий игрок — очки ×2",
+    rule("repeat-category-double"),
+  ),
+  gameCard(
+    "taken-category-bonus",
+    "Наследство",
+    "Каждый следующий, кто закрывает уже занятую кем-то категорию, получает +6",
+    rule("taken-category-bonus", "6"),
+  ),
+  gameCard(
+    "taken-category-penalty",
+    "Остывающая тема",
+    "Каждый следующий в ту же категорию получает на 3 меньше своего броска",
+    rule("taken-category-penalty", "3"),
+  ),
+  gameCard(
+    "card-cost",
+    "Дорогой протокол",
+    "Разыграть протокол стоит 5 очков; итог не ниже нуля",
+    rule("card-cost", "5"),
+  ),
+
+  // ── Turn and freeze rules ─────────────────────────────────────────────────
+  gameCard(
+    "auto-freeze-lowest",
+    "Минимальная опора",
+    "После броска сам замораживается наименьший кубик",
+    rule("auto-freeze", "lowest"),
+  ),
+  gameCard(
+    "auto-freeze-highest",
+    "Максимальная опора",
+    "После броска сам замораживается наибольший кубик",
+    rule("auto-freeze", "highest"),
+  ),
+  gameCard(
+    "frozen-penalty",
+    "Плата за заморозку",
+    "Каждый замороженный кубик снимает 1 очко при фиксации",
+    rule("frozen-penalty", "1"),
+  ),
+  gameCard(
+    "forced-reroll",
+    "Обязательный повтор",
+    "После первого броска обязан перебросить хотя бы раз",
+    rule("forced-reroll"),
+  ),
 
   // ── Category swap ─────────────────────────────────────────────────────────
   gameCard(

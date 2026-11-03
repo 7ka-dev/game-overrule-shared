@@ -1,4 +1,8 @@
+import type { ScoreInversionMode } from "../types/card.js";
 import type { Category, UpperCategory, LowerCategory } from "../types/category.js";
+import { freezeConfig, frozenDiceCount } from "./freeze.js";
+import { ruleNumber, ruleOf, type ActiveRule } from "./rules.js";
+import { MAX_ROLLS } from "./turn.js";
 
 type FrequencyMap = Record<number, number>;
 
@@ -123,8 +127,61 @@ export interface ScoreModifiers {
   jokerFaces?: readonly number[];
   /** Invert faces during scoring: 1↔6, 2↔5, 3↔4. */
   invert?: boolean;
+  /** Face transform during scoring; takes precedence over `invert`. */
+  inversionMode?: ScoreInversionMode | null;
   /** Dice with the selected face multiply the total instead of adding to it. */
   dieMultiplierFace?: number | null;
+}
+
+export type ScoreSheet = Partial<Record<Category, number>>;
+
+export interface ScorePlayerContext {
+  sheet: ScoreSheet;
+}
+
+export interface ScorePlayerRuntime {
+  wildDice?: readonly boolean[];
+  keepDice?: readonly boolean[];
+  hasRolled?: boolean;
+  rollsLeft?: number;
+  turnRolls?: number;
+  turnPenalty?: number;
+}
+
+/** Everything needed to calculate one category score (shared server/client). */
+export interface ScoreContext {
+  dice: readonly number[];
+  category: Category;
+  rules: readonly ActiveRule[];
+  player: ScorePlayerContext & ScorePlayerRuntime;
+  allPlayers?: readonly ScorePlayerContext[];
+  /** Category closed by the previous turn, for repeat-category-double. */
+  previousCategory?: Category | null;
+}
+
+/** Reads the active face transform. A legacy empty value means inversion. */
+export function scoreInversionMode(rules: readonly ActiveRule[]): ScoreInversionMode | null {
+  const rule = ruleOf(rules, "score-inversion");
+  if (!rule) {
+    return null;
+  }
+  if (rule.value === "shift-up" || rule.value === "shift-down") {
+    return rule.value;
+  }
+  return "invert";
+}
+
+function transformFace(value: number, mode: ScoreInversionMode | null): number {
+  switch (mode) {
+    case "shift-up":
+      return value === 6 ? 1 : value + 1;
+    case "shift-down":
+      return value === 1 ? 6 : value - 1;
+    case "invert":
+      return 7 - value;
+    default:
+      return value;
+  }
 }
 
 function applyDieMultiplier(
@@ -171,8 +228,8 @@ export function scoreCategoryWithRules(
   category: Category,
   modifiers: ScoreModifiers = {},
 ): number {
-  const inverted = modifiers.invert === true;
-  const values = inverted ? dice.map((value) => 7 - value) : [...dice];
+  const inversion = modifiers.inversionMode ?? (modifiers.invert === true ? "invert" : null);
+  const values = dice.map((value) => transformFace(value, inversion));
 
   const wildIndices: number[] = [];
   for (let index = 0; index < dice.length; index += 1) {
@@ -203,7 +260,7 @@ export function scoreCategoryWithRules(
 
     for (let face = 1; face <= 6; face += 1) {
       candidateActual[dieIndex] = face;
-      candidateValues[dieIndex] = inverted ? 7 - face : face;
+      candidateValues[dieIndex] = transformFace(face, inversion);
       scoreAssignments(wildIndex + 1);
     }
     candidateActual[dieIndex] = dice[dieIndex]!;
@@ -216,6 +273,92 @@ export function scoreCategoryWithRules(
     return applyDieMultiplier(dice, category, modifiers.dieMultiplierFace, base);
   }
   return base;
+}
+
+/**
+ * Full score pipeline, shared by the server and the client preview.
+ *
+ * Order: base → face transform → fixed bonuses → multipliers → additive
+ * bonuses → category cap → penalties → personal penalty → max(0).
+ */
+export function scoreWithRules(context: ScoreContext): number {
+  const { dice, category, rules, player } = context;
+  const allPlayers = context.allPlayers ?? [];
+
+  const jokerFaces = rules
+    .filter((rule) => rule.aspect === "joker-face")
+    .map((rule) => Number(rule.value));
+  const dieMultiplier = ruleOf(rules, "die-multiplier");
+
+  let score = scoreCategoryWithRules(dice, category, {
+    wildDice: player.wildDice,
+    jokerFaces,
+    inversionMode: scoreInversionMode(rules),
+    dieMultiplierFace: dieMultiplier !== undefined ? Number(dieMultiplier.value) : null,
+  });
+
+  if (ruleOf(rules, "seven-triple") && score === 7) {
+    score = 21;
+  }
+
+  const turnRolls = player.turnRolls ?? MAX_ROLLS;
+  const isFirstRoll =
+    player.hasRolled === true && player.rollsLeft === turnRolls - 1;
+  let multiplier = 1;
+  if (ruleOf(rules, "first-roll-double") && isFirstRoll) {
+    multiplier *= 2;
+  }
+  if (ruleOf(rules, "target-category-double")?.value === category) {
+    multiplier *= 2;
+  }
+  if (
+    ruleOf(rules, "repeat-category-double") &&
+    context.previousCategory === category
+  ) {
+    multiplier *= 2;
+  }
+  score *= multiplier;
+
+  // "All rolls used" is a relative +50% bonus, so it belongs to the additive
+  // stage after multipliers rather than to the fixed base score.
+  if (ruleOf(rules, "all-rolls-bonus") && player.rollsLeft === 0) {
+    score = Math.round(score * 1.5);
+  }
+
+  const taken = allPlayers.some((entry) => entry.sheet[category] !== undefined);
+  const takenBonus = ruleOf(rules, "taken-category-bonus");
+  if (taken && takenBonus) {
+    score += ruleNumber(takenBonus, 6);
+  }
+
+  const cap = ruleOf(rules, "category-cap");
+  if (cap?.value === "best-recorded") {
+    let best = -Infinity;
+    for (const entry of allPlayers) {
+      const recorded = entry.sheet[category];
+      if (recorded !== undefined) {
+        best = Math.max(best, recorded);
+      }
+    }
+    if (best !== -Infinity) {
+      score = Math.min(score, best);
+    }
+  }
+
+  const takenPenalty = ruleOf(rules, "taken-category-penalty");
+  if (taken && takenPenalty) {
+    score -= ruleNumber(takenPenalty, 3);
+  }
+
+  const frozenPenalty = ruleOf(rules, "frozen-penalty");
+  if (frozenPenalty) {
+    score -=
+      frozenDiceCount(dice, player.keepDice ?? [], freezeConfig(rules)) *
+      ruleNumber(frozenPenalty, 1);
+  }
+
+  score -= player.turnPenalty ?? 0;
+  return Math.max(0, score);
 }
 
 export function scoreUpperCategories(dice: readonly number[]): Record<UpperCategory, number> {
