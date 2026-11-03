@@ -21,6 +21,9 @@ export type ClientToServer = {
     type: "DISCARD";
     cardId: CardId;
 } | {
+    type: "DISCARD_TO_DECK";
+    cardId: CardId;
+} | {
     type: "COMMIT_SCORE";
     category: import("../types/category").Category;
 } | {

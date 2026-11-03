@@ -74,6 +74,13 @@ exports.CARD_CATALOG = [
     gameCard("auto-freeze-highest", "Максимальная опора", "После броска сам замораживается наибольший кубик", rule("auto-freeze", "highest")),
     gameCard("frozen-penalty", "Плата за заморозку", "Каждый замороженный кубик снимает 1 очко при фиксации", rule("frozen-penalty", "1")),
     gameCard("forced-reroll", "Обязательный повтор", "После первого броска обязан перебросить хотя бы раз", rule("forced-reroll")),
+    // ── Card control ──────────────────────────────────────────────────────────
+    gameCard("before-first-roll", "До первого броска", "Протоколы можно объявлять только до первого броска хода", rule("card-timing", "before-roll"), { playableIn: ["Roll"] }),
+    gameCard("cancel-one", "Отзыв протокола", "Отмени 1 активное правило", undefined, { action: "cancel-rule", choice: "rule" }),
+    gameCard("cancel-two", "Двойной отзыв", "Отмени 2 активных правила", undefined, { action: "cancel-rules", actionValue: "2", choice: "rule-pair" }),
+    gameCard("cancel-all", "Полная нейтрализация", "Отмени все наложенные правила", undefined, { action: "cancel-all-rules" }),
+    gameCard("standings", "Уравнитель", "Единственный лидер не может играть протоколы; единственный последний может сыграть два за ход; при ничье правило молчит", rule("standings-card-limit")),
+    gameCard("first-round-lock", "Немой первый круг", "В первом круге протоколы нельзя играть", rule("card-lock-round", "1")),
     // ── Category swap ─────────────────────────────────────────────────────────
     gameCard("swap-category", "Замена", "Поменяй местами две комбинации: статус и очки переходят", undefined, { action: "swap-category", choice: "category-pair" }),
 ];

@@ -8,7 +8,7 @@ contract used by both the client and the Colyseus server.
 | Path | Purpose |
 |------|---------|
 | `src/types` | Domain types: dice, categories, phases, cards, players, events |
-| `src/core` | Pure game rules: scoring, deck, dice, rules, freeze, turn, log |
+| `src/core` | Pure game rules: scoring, cards, deck, dice, rules, freeze, turn, log |
 | `src/protocol` | Client/server message contract |
 | `src/utils` | Pure helpers (seeded shuffle) |
 | `src/wire.ts` | Wire-state shape for the Colyseus room + room name constants |

@@ -22,3 +22,4 @@ __exportStar(require("./freeze.js"), exports);
 __exportStar(require("./categories.js"), exports);
 __exportStar(require("./turn.js"), exports);
 __exportStar(require("./deck.js"), exports);
+__exportStar(require("./cards.js"), exports);

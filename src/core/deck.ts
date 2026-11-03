@@ -17,7 +17,7 @@ function card(
   text: string,
   playableIn: Phase[],
   rule?: CardRuleSpec,
-  extra?: Pick<Card, "action" | "choice">,
+  extra?: Pick<Card, "action" | "choice" | "actionValue">,
 ): Card {
   return { id, name, text, playableIn, effects: [], rule, ...extra };
 }
@@ -28,7 +28,7 @@ const gameCard = (
   name: string,
   text: string,
   rule: CardRuleSpec | undefined,
-  extra?: Pick<Card, "action" | "choice"> & { playableIn?: Phase[] },
+  extra?: Pick<Card, "action" | "choice" | "actionValue"> & { playableIn?: Phase[] },
 ): Card => {
   const { playableIn = ["Roll", "Decision", "Commit"], ...rest } = extra ?? {};
   return card(id, name, text, playableIn, rule, rest);
@@ -224,6 +224,48 @@ export const CARD_CATALOG: readonly Card[] = [
     "Обязательный повтор",
     "После первого броска обязан перебросить хотя бы раз",
     rule("forced-reroll"),
+  ),
+
+  // ── Card control ──────────────────────────────────────────────────────────
+  gameCard(
+    "before-first-roll",
+    "До первого броска",
+    "Протоколы можно объявлять только до первого броска хода",
+    rule("card-timing", "before-roll"),
+    { playableIn: ["Roll"] },
+  ),
+  gameCard(
+    "cancel-one",
+    "Отзыв протокола",
+    "Отмени 1 активное правило",
+    undefined,
+    { action: "cancel-rule", choice: "rule" },
+  ),
+  gameCard(
+    "cancel-two",
+    "Двойной отзыв",
+    "Отмени 2 активных правила",
+    undefined,
+    { action: "cancel-rules", actionValue: "2", choice: "rule-pair" },
+  ),
+  gameCard(
+    "cancel-all",
+    "Полная нейтрализация",
+    "Отмени все наложенные правила",
+    undefined,
+    { action: "cancel-all-rules" },
+  ),
+  gameCard(
+    "standings",
+    "Уравнитель",
+    "Единственный лидер не может играть протоколы; единственный последний может сыграть два за ход; при ничье правило молчит",
+    rule("standings-card-limit"),
+  ),
+  gameCard(
+    "first-round-lock",
+    "Немой первый круг",
+    "В первом круге протоколы нельзя играть",
+    rule("card-lock-round", "1"),
   ),
 
   // ── Category swap ─────────────────────────────────────────────────────────
